@@ -1,0 +1,56 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: todo-api-app
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: todo-api-app
+    spec:
+      containers:
+      - name: todo-api-app
+        image: krishnaji/dotnetcoreapiapp
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-api-app
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: todo-api-app
+---
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: todo-api-app
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+  - host: todo-api-app.2a496fbf8e2345a6a9aa.eastus.aksapp.io
+    http:
+      paths:
+      - backend:
+          serviceName: todo-api-app
+          servicePort: 80
+        path: /
