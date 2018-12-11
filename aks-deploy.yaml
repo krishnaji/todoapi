@@ -30,27 +30,10 @@ kind: Service
 metadata:
   name: todo-api-app
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - port: 80
     protocol: TCP
     targetPort: 8080
   selector:
     app: todo-api-app
----
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: todo-api-app
-  annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
-spec:
-  rules:
-  - host: todo-api-app.2a496fbf8e2345a6a9aa.eastus.aksapp.io
-    http:
-      paths:
-      - backend:
-          serviceName: todo-api-app
-          servicePort: 80
-        path: /
